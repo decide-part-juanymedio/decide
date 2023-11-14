@@ -2,6 +2,11 @@ from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import generics
 from rest_framework.response import Response
+from tablib import Dataset
+from .admin import CensusResource
+from django.contrib.auth.models import User
+from django.db import models
+from django.http import HttpResponse
 from rest_framework.status import (
         HTTP_201_CREATED as ST_201,
         HTTP_204_NO_CONTENT as ST_204,
@@ -49,3 +54,11 @@ class CensusDetail(generics.RetrieveDestroyAPIView):
         except ObjectDoesNotExist:
             return Response('Invalid voter', status=ST_401)
         return Response('Valid voter')
+
+#referencia sacada de https://django-import-export.readthedocs.io/en/latest/getting_started.html#exporting-data
+def ExportTocsv(request,format):
+    census_resource = CensusResource()
+    dataset = census_resource.export()
+    response = HttpResponse(dataset.csv, content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="census.csv"'
+    return response
