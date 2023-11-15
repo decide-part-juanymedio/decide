@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from rest_framework.test import APIClient
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.urls import reverse
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -14,6 +15,7 @@ from .models import Census
 from base import mods
 from base.tests import BaseTestCase
 from datetime import datetime
+
 
 
 class CensusTestCase(BaseTestCase):
@@ -164,3 +166,23 @@ class CensusTest(StaticLiveServerTestCase):
 
         self.assertTrue(self.cleaner.find_element_by_xpath('/html/body/div/div[3]/div/div[1]/div/form/div/p').text == 'Please correct the errors below.')
         self.assertTrue(self.cleaner.current_url == self.live_server_url+"/admin/census/census/add")
+
+class ReuseCensusTestCase(TestCase):
+    def setUp(self):
+        # Crea datos de censo para ser reutilizados
+        self.census = Census.objects.create(voting_id=1, voter_id=1)
+        self.census2 = Census.objects.create(voting_id=2, voter_id=2)
+    
+    def tearDown(self):
+        super().tearDown()
+        self.census = None
+        self.census2 = None
+
+    def test_reuse_census(self):
+        # Simula una solicitud a la vista 'reuseCensus'
+        url = reverse('reuse_census', kwargs={'new_voting': 2, 'old_voting': 1})  
+        response = self.client.get(url)
+        # Verifica que la vista devuelve un código de estado HTTP 200 OK
+        self.assertEqual(response.status_code, 200)
+        # Verifica que los votantes se han reutilizado correctamente
+        self.assertEqual(Census.objects.filter(voting_id=2).count(), 2)  

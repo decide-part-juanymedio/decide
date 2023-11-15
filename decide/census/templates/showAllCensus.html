@@ -1,0 +1,40 @@
+{% extends 'nav.html' %}
+{% load i18n static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Census - All Census{% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Voter Id</th>
+                    <th scope="col">Voting Id</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for census in allCensus %}
+                <tr>
+                    <th scope="row">{{ census.id }}</th>
+                    <td>{{ census.voter_id }}</td>
+                    <td>{{ census.voting_id }}</td>
+                    {% if request.user.is_staff %}
+
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% block extrabody %}
+    {% endblock %}
+</body>
+</html>
+{% endblock %}

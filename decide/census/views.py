@@ -3,15 +3,20 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.status import (
-        HTTP_201_CREATED as ST_201,
-        HTTP_204_NO_CONTENT as ST_204,
-        HTTP_400_BAD_REQUEST as ST_400,
-        HTTP_401_UNAUTHORIZED as ST_401,
-        HTTP_409_CONFLICT as ST_409
+    HTTP_201_CREATED as ST_201,
+    HTTP_204_NO_CONTENT as ST_204,
+    HTTP_400_BAD_REQUEST as ST_400,
+    HTTP_401_UNAUTHORIZED as ST_401,
+    HTTP_409_CONFLICT as ST_409
 )
 
 from base.perms import UserIsStaff
+from .form import *
 from .models import Census
+from django.http import HttpResponse
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.db import models
 
 
 class CensusCreate(generics.ListCreateAPIView):
@@ -49,3 +54,63 @@ class CensusDetail(generics.RetrieveDestroyAPIView):
         except ObjectDoesNotExist:
             return Response('Invalid voter', status=ST_401)
         return Response('Valid voter')
+
+def reuseCensus(request, new_voting, old_voting):
+
+    try:
+        voters=Census.objects.filter(voting_id=old_voting).values_list('voter_id', flat=True) 
+        votersNoDuplicate = set()
+        
+        for v in voters:
+            votersNoDuplicate.add(v)
+
+
+        for v in list(votersNoDuplicate): 
+            census = Census(voting_id=new_voting, voter_id= v)
+            census.save()
+    except:
+        return HttpResponse('el censo objetivo no está vacio')
+  
+               
+
+    return HttpResponse('REUTILIZADO CON ÉXITO')
+
+def censusShow(request):
+    context = {
+        'allCensus': Census.objects.all(),
+    }
+    return render(request, "showAllCensus.html", context)
+
+def reuseview(request):
+    if request.method == 'POST':
+                form = CensusReuseForm(request.POST)
+                if form.is_valid():
+                    old_voting = form.cleaned_data['oldVoting']
+                    new_voting = form.cleaned_data['newVoting']
+                    try:
+                        voters=Census.objects.filter(voting_id=old_voting.id).values_list('voter_id', flat=True) 
+                        votersNoDuplicate = set()
+
+                        for v in voters:
+                            votersNoDuplicate.add(v)
+
+
+                        for v in list(votersNoDuplicate): 
+                            census = Census(voting_id=new_voting.id, voter_id= v)
+                            census.save()
+
+                        messages.success(request, '¡REUTILIZADO CON ÉXITO!')
+                        return redirect("/census/showAll")
+
+
+                    except :
+                        messages.error(request,f"La votacion {old_voting.name} tiene el mismo censo que la votacion {new_voting.name}")
+                        return redirect("/census/reuseView")
+    else:
+        form = CensusReuseForm()
+        context = {
+                'form': form
+        }
+        return render(request, "censusReused.html", context)
+
+
