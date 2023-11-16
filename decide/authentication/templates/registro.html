@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
+{% endblock %}
+
+{% block content %}
+<div id="app-booth" class="pagecontent">
+    <h1>User Registration</h1>
+
+    <form action="" method="post">
+        {% csrf_token %}
+
+        {% for field in user_form %}
+            <div class="field">
+                <label for="{{ field.id_for_label }}" class="label">{{ field.label_tag }}</label>
+                {{ field }}
+
+                {% for error in field.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+</div>
+{% endblock %}
