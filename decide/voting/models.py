@@ -31,7 +31,7 @@ class QuestionOption(models.Model):
 class Voting(models.Model):
     name = models.CharField(max_length=200)
     desc = models.TextField(blank=True, null=True)
-    question = models.ForeignKey(Question, related_name='voting', on_delete=models.CASCADE)
+    questions = models.ManyToManyField(Question, related_name='voting', through ='VotingQuestion')
 
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
@@ -131,3 +131,10 @@ class Voting(models.Model):
 
     def __str__(self):
         return self.name
+
+class VotingQuestion(models.Model):
+    voting = models.ForeignKey(Voting, related_name='voting', on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, related_name='question', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return 'Voting {} - Question {}'.format(self.voting.name, self.question.desc)
