@@ -4,6 +4,7 @@ from django.utils import timezone
 from .models import QuestionOption
 from .models import Question
 from .models import Voting
+from .models import VotingQuestion
 
 from .filters import StartedFilter
 
@@ -34,6 +35,10 @@ class QuestionOptionInline(admin.TabularInline):
 class QuestionAdmin(admin.ModelAdmin):
     inlines = [QuestionOptionInline]
 
+class VotingQuestionInLine(admin.TabularInline):
+    model = VotingQuestion
+    extra = 1
+
 
 class VotingAdmin(admin.ModelAdmin):
     list_display = ('name', 'start_date', 'end_date')
@@ -44,7 +49,7 @@ class VotingAdmin(admin.ModelAdmin):
     search_fields = ('name', )
 
     actions = [ start, stop, tally ]
-
+    inlines = [VotingQuestionInLine]
 
 admin.site.register(Voting, VotingAdmin)
 admin.site.register(Question, QuestionAdmin)
