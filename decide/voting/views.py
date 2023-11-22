@@ -31,7 +31,7 @@ class VotingView(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         self.permission_classes = (UserIsStaff,)
         self.check_permissions(request)
-        for data in ['name', 'desc', 'question', 'question_opt']:
+        for data in ['name', 'desc', 'question', 'question_opt', 'question_type']:
             if not data in request.data:
                 return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -101,3 +101,13 @@ class VotingUpdate(generics.RetrieveUpdateDestroyAPIView):
             msg = 'Action not found, try with start, stop or tally'
             st = status.HTTP_400_BAD_REQUEST
         return Response(msg, status=st)
+    
+
+def yes_no_question(self):
+    options = QuestionOption.objects.all().filter(question=self)
+    for o in options:
+        o.delete()
+    option1 = QuestionOption(option='Yes',number=1, question=self)
+    option1.save()
+    option2 = QuestionOption(option='No',number=2, question=self)   
+    option2.save() 
