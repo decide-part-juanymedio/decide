@@ -101,3 +101,24 @@ ENV/
 .mypy_cache/
 
 .vagrant
+egcenv/lib64
+egcenv/pyvenv.cfg
+egcenv/bin/activate
+egcenv/bin/activate.csh
+egcenv/bin/activate.fish
+egcenv/bin/Activate.ps1
+egcenv/bin/coverage
+egcenv/bin/coverage-3.10
+egcenv/bin/coverage3
+egcenv/bin/django-admin
+egcenv/bin/normalizer
+egcenv/bin/nosetests
+egcenv/bin/nosetests-3.4
+egcenv/bin/pip3
+egcenv/bin/pip
+egcenv/bin/python
+egcenv/bin/pip3.10
+egcenv/bin/python3
+egcenv/bin/sqlformat
+egcenv/bin/python3.10
+egcenv/man/man1/nosetests.1
